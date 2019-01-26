@@ -1,6 +1,8 @@
 const axios = require('axios');
-
+const db = require('../database/dbConfig');
+const bcrypt = require('bcryptjs');
 const { authenticate } = require('../auth/authenticate');
+const { tokenGenerator } = require('../auth/authenticate')
 
 module.exports = server => {
   server.post('/api/register', register);
@@ -10,7 +12,18 @@ module.exports = server => {
 
 function register(req, res) {
   // implement user registration
-  
+    const user = req.body;
+    user.password = bcrypt.hashSync(user.password)
+    const token = tokenGenerator(user)
+    console.log(user)
+    db.insert(user)
+    .then(users => {
+        res.status(201).json(users)
+    })
+    .catch(err => {
+      res.status(500).json({message: "error could not register"})
+    })
+
 }
 
 function login(req, res) {

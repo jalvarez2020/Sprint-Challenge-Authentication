@@ -7,12 +7,12 @@ const jwtKey =
 // quickly see what this file exports
 module.exports = {
   authenticate,
+  tokenGenerator,
 };
 
 // implementation details
 function authenticate(req, res, next) {
   const token = req.get('Authorization');
-
   if (token) {
     jwt.verify(token, jwtKey, (err, decoded) => {
       if (err) return res.status(401).json(err);
@@ -26,4 +26,16 @@ function authenticate(req, res, next) {
       error: 'No token provided, must be set on the Authorization Header',
     });
   }
+};
+
+function tokenGenerator(user)  {
+  const payload = {
+    user: user.username,
+    password: user.password
+  }
+  const options = {
+    expiresIn: '1h',
+  }
+
+  return jwt.sign(payload, jwtKey, options)
 }
