@@ -14,11 +14,13 @@ function register(req, res) {
   // implement user registration
     const user = req.body;
     user.password = bcrypt.hashSync(user.password)
-    const token = tokenGenerator(user)
-    console.log(user)
-    db.insert(user)
-    .then(users => {
-        res.status(201).json(users)
+    const token = tokenGenerator(user.username)
+    console.log(token)
+    db.insert(user, token)
+    .then(respond => {
+        res.status(201).json({
+          message: "Account Registered"
+        })
     })
     .catch(err => {
       res.status(500).json({message: "error could not register"})
