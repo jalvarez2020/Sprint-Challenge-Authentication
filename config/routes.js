@@ -19,7 +19,7 @@ function register(req, res) {
     db.insert(user, token)
     .then(respond => {
         res.status(201).json({
-          message: "Account Registered"
+          message: "Account Registered", token
         })
     })
     .catch(err => {
@@ -28,8 +28,24 @@ function register(req, res) {
 
 }
 
-function login(req, res) {
+function login(req, res,) {
   // implement user login
+  const user = req.body;
+  console.log(user.username)
+  db.findByUsername(user.username)
+    .then(users => {
+      if (bcrypt.compareSync(user.password, users.password, 10)) {
+        const token = tokenGenerator(user.username);
+        res.status(200).json({ message: "Logged in", token })
+      } else {
+        res.status(400).json({message: "incorrect username or password"})
+      }
+    })
+    .catch(err => {
+      res.status(404).json({message: "user does not exist"})
+    })
+    
+
 }
 
 function getJokes(req, res) {
